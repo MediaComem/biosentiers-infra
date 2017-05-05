@@ -1,0 +1,32 @@
+#!/usr/bin/with-contenv sh
+set -e
+
+#DATABASE_AVAILABLE=
+#
+#export PGPASSWORD="$BIOSENTIERS_DATABASE_PASSWORD"
+#for N in {1..10}; do
+#  if psql -h biosentiers_db -U "$BIOSENTIERS_DATABASE_USERNAME" -c '\l'; then
+#    DATABASE_AVAILABLE=yes
+#    break
+#  fi
+#
+#  >&2 echo "Postgres is unavailable - waiting"
+#  sleep 1
+#done
+#
+#if [ -z "$DATABASE_AVAILABLE" ]; then
+#  exit 1
+#fi
+#
+#>&2 echo "Postgres is up"
+
+# FIXME: only wait on the database for a limited time
+export PGPASSWORD="$DATABASE_PASSWORD"
+until psql -h biosentiers_db -U "$DATABASE_USERNAME" -c '\l'; do
+  >&2 echo "Postgres is unavailable - waiting"
+  sleep 1
+done
+
+>&2 echo "Postgres is up"
+
+exec "$@"

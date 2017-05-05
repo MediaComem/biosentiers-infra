@@ -1,0 +1,73 @@
+version: '3'
+
+networks:
+  dmz:
+    driver: bridge
+  intra:
+    driver: overlay
+
+services:
+
+  rp:
+    image: biosentiers/rp
+    build: /srv/biosentiers/rp
+    container_name: biosentiers_rp
+    depends_on:
+      - app
+    networks:
+      - dmz
+      - intra
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+
+  app:
+    image: biosentiers/app
+    build: /srv/biosentiers/app
+    depends_on:
+      - db
+    environment:
+      DATABASE_HOST: biosentiers_db
+      DATABASE_USERNAME: biosentiers
+      DATABASE_PASSWORD: changeme
+      NODE_ENV: production
+    networks:
+      - intra
+    restart: always
+
+  db:
+    image: biosentiers/db
+    build: /srv/biosentiers/db
+    container_name: biosentiers_db
+    environment:
+      POSTGRES_PASSWORD: admin
+      DATABASE_NAME: biosentiers
+      DATABASE_USERNAME: biosentiers
+      DATABASE_PASSWORD: changeme
+    volumes:
+      - "db_data:/var/lib/postgresql/data"
+    networks:
+      - intra
+    restart: always
+
+  migrate:
+    image: biosentiers/app
+    build: /srv/biosentiers/app
+    depends_on:
+      - db
+    entrypoint:
+      - /usr/src/app/node_modules/knex/bin/cli.js
+    command:
+      - migrate:latest
+    environment:
+      DATABASE_HOST: biosentiers_db
+      DATABASE_USERNAME: biosentiers
+      DATABASE_PASSWORD: changeme
+      NODE_ENV: production
+    networks:
+      - intra
+    restart: "no"
+
+volumes:
+  db_data:

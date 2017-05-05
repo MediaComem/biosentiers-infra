@@ -1,0 +1,3 @@
+#!/usr/bin/with-contenv sh
+cd /usr/src/app
+exec npm start
