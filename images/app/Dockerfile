@@ -17,18 +17,23 @@ RUN apk add --update --virtual .build-deps curl \
 # Set up s6 configuration files
 ADD etc /etc/
 
-# Install postgresql client (to test database connection on container startup)
-RUN apk add --update postgresql-client \
+# Install tools
+RUN apk add --update git postgresql-client \
     && rm -rf /var/cache/apk/*
 
-# Install backend dependencies
-RUN mkdir -p /usr/src/app/public
-WORKDIR /usr/src/app
-ADD backend/package.json /usr/src/app/
-RUN npm install && npm cache clean
+ARG BIOSENTIERS_BACKEND_REPO="https://github.com/MediaComem/biosentiers-backend.git"
+ARG BIOSENTIERS_FRONTEND_REPO="https://github.com/MediaComem/biosentiers-frontend.git"
+ARG BIOSENTIERS_BACKEND_REF="participants"
+ARG BIOSENTIERS_FRONTEND_REF="new-excursion"
+ARG TIME
 
-# Copy backend
-ADD backend /usr/src/app/
+# Install backend dependencies
+RUN echo $TIME \
+    && mkdir -p /usr/src \
+    && git clone -b "$BIOSENTIERS_BACKEND_REF" "$BIOSENTIERS_BACKEND_REPO" /usr/src/app \
+    && cd /usr/src/app \
+    && npm install \
+    && npm cache clean
 
 # Copy frontend
 #RUN mkdir -p /tmp/app /var/www/app
@@ -42,6 +47,8 @@ ADD backend /usr/src/app/
 #    cp -R /tmp/app/dist/* /var/www/app && \
 #    rm -fr /tmp/*
 ADD frontend/dist /usr/src/app/public/
+
+WORKDIR /usr/src/app
 
 # Set s6 as the entrypoint
 ENTRYPOINT [ "/init" ]

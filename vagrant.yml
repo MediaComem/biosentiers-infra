@@ -1,0 +1,21 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - env.yml
+  vars:
+    server_name: biosentiers
+    docker_compose_version: 1.12.0
+    docker_network_name: "{{ server_name }}"
+  roles:
+    - role: vagrant
+    - role: server
+    - role: docker-secret
+      secret_name: biosentiers_db_postgres_password_v1
+      secret_value: "{{ db_postgres_password }}"
+    - role: docker-secret
+      secret_name: biosentiers_db_password_v1
+      secret_value: "{{ db_password }}"
+  tasks:
+    - name: add local ssh key to root
+      authorized_key: user=root key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"

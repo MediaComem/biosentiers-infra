@@ -20,9 +20,13 @@ set -e
 #
 #>&2 echo "Postgres is up"
 
+if [[ -z "$DATABASE_PASSWORD" ]] && [[ -e "$DATABASE_PASSWORD_FILE" ]]; then
+  DATABASE_PASSWORD="$( cat "$DATABASE_PASSWORD_FILE" | head -n 1 )"
+fi
+
 # FIXME: only wait on the database for a limited time
 export PGPASSWORD="$DATABASE_PASSWORD"
-until psql -h biosentiers_db -U "$DATABASE_USERNAME" -c '\l'; do
+until psql -h "$DATABASE_HOST" -U "$DATABASE_USERNAME" -c '\l'; do
   >&2 echo "Postgres is unavailable - waiting"
   sleep 1
 done

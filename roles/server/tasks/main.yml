@@ -1,0 +1,16 @@
+---
+# Server Config
+- name: create server config directory
+  file:
+    path: /etc/{{ server_name }}
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+- name: set up docker compose config file
+  template:
+    src: docker-compose.yml
+    dest: /etc/{{ server_name }}/docker-compose.yml
+    owner: root
+    group: root
+    mode: 0600

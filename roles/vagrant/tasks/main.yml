@@ -1,0 +1,14 @@
+---
+- name: create source directory
+  file:
+    path: /srv/biosentiers
+    state: directory
+- name: create link to docker image directories
+  file:
+    src: /vagrant/images/{{ item }}
+    dest: /srv/biosentiers/{{ item }}
+    state: link
+  with_items:
+    - app
+    - db
+    - rp

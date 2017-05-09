@@ -1,0 +1,82 @@
+version: '3.1'
+
+networks:
+  main:
+    driver: overlay
+
+secrets:
+  biosentiers_db_postgres_password_v1:
+    external: true
+  biosentiers_db_password_v1:
+    external: true
+
+services:
+
+  rp:
+    image: biosentiers/rp
+    depends_on:
+      - app
+    deploy:
+      mode: global
+    networks:
+      - main
+    ports:
+      - "80:80"
+      - "443:443"
+
+  app:
+    image: biosentiers/app
+    depends_on:
+      - db
+    deploy:
+      replicas: 2
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USERNAME: biosentiers
+      DATABASE_PASSWORD_FILE: /run/secrets/db_password
+      NODE_ENV: production
+    networks:
+      - main
+    secrets:
+      - source: biosentiers_db_password_v1
+        target: db_password
+
+  db:
+    image: biosentiers/db
+    deploy:
+      mode: global
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_postgres_password
+      DATABASE_NAME: biosentiers
+      DATABASE_USERNAME: biosentiers
+      DATABASE_PASSWORD_FILE: /run/secrets/db_password
+    networks:
+      - main
+    secrets:
+      - source: biosentiers_db_postgres_password_v1
+        target: db_postgres_password
+      - source: biosentiers_db_password_v1
+        target: db_password
+    volumes:
+      - "db_data:/var/lib/postgresql/data"
+
+#  migrate:
+#    image: biosentiers/app
+#    build: /srv/biosentiers/app
+#    depends_on:
+#      - db
+#    entrypoint:
+#      - /usr/src/app/node_modules/knex/bin/cli.js
+#    command:
+#      - migrate:latest
+#    environment:
+#      DATABASE_HOST: biosentiers_db
+#      DATABASE_USERNAME: biosentiers
+#      DATABASE_PASSWORD: changeme
+#      NODE_ENV: production
+#    networks:
+#      - intra
+#    restart: "no"
+
+volumes:
+  db_data:

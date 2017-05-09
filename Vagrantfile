@@ -20,7 +20,7 @@ Vagrant.configure('2') do |config|
   SHELL
 
   config.vm.provision 'ansible' do |ansible|
-    ansible.playbook = 'playbook.yml'
+    ansible.playbook = 'vagrant.yml'
     ansible.tags = ENV['ANSIBLE_TAGS'].split(',') if ENV.key? 'ANSIBLE_TAGS'
     ansible.skip_tags = ENV['ANSIBLE_SKIP_TAGS'].split(',') if ENV.key? 'ANSIBLE_SKIP_TAGS'
     ansible.extra_vars = {}
