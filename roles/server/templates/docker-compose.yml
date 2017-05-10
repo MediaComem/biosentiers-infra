@@ -1,7 +1,11 @@
 version: '3.1'
 
 networks:
-  main:
+  public:
+    driver: overlay
+  apps:
+    driver: overlay
+  storage:
     driver: overlay
 
 secrets:
@@ -13,19 +17,20 @@ secrets:
 services:
 
   rp:
-    image: biosentiers/rp
+    image: 127.0.0.1:5000/biosentiers/rp:${RP_TAG:-latest}
     depends_on:
       - app
     deploy:
       mode: global
     networks:
-      - main
+      - public
+      - apps
     ports:
       - "80:80"
       - "443:443"
 
   app:
-    image: biosentiers/app
+    image: 127.0.0.1:5000/biosentiers/app:${APP_TAG:-latest}
     depends_on:
       - db
     deploy:
@@ -36,13 +41,16 @@ services:
       DATABASE_PASSWORD_FILE: /run/secrets/db_password
       NODE_ENV: production
     networks:
-      - main
+      apps:
+        aliases:
+          - app
+      storage:
     secrets:
       - source: biosentiers_db_password_v1
         target: db_password
 
   db:
-    image: biosentiers/db
+    image: 127.0.0.1:5000/biosentiers/db:${DB_TAG:-latest}
     deploy:
       mode: global
     environment:
@@ -51,7 +59,7 @@ services:
       DATABASE_USERNAME: biosentiers
       DATABASE_PASSWORD_FILE: /run/secrets/db_password
     networks:
-      - main
+      - storage
     secrets:
       - source: biosentiers_db_postgres_password_v1
         target: db_postgres_password

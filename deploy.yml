@@ -8,22 +8,30 @@
   tasks:
     - name: build app docker image
       docker_image:
-        name: biosentiers/app
-        path: /srv/biosentiers/app
+        name: 127.0.0.1:5000/biosentiers/app
+        tag: deploy
+        path: /vagrant/images/app
         force: true
+        push: true
         buildargs:
           BIOSENTIERS_BACKEND_REF: deploy
           TIME: "{{ ansible_date_time.epoch }}"
         state: present
     - name: build db docker image
       docker_image:
-        name: biosentiers/db
-        path: /srv/biosentiers/db
+        name: 127.0.0.1:5000/biosentiers/db
+        path: /vagrant/images/db
         force: true
+        push: true
         state: present
     - name: build rp docker image
       docker_image:
-        name: biosentiers/rp
-        path: /srv/biosentiers/rp
+        name: 127.0.0.1:5000/biosentiers/rp
+        path: /vagrant/images/rp
         force: true
+        push: true
         state: present
+    - name: clean up old images
+      shell: docker images | grep '127.0.0.1:5000' | grep '<none>' | tr -s ' ' | sed 's/^ *//' | cut -d ' ' -f 3 | xargs docker rmi
+      register: result
+      changed_when: result.rc != 0
