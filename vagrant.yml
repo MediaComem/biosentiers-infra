@@ -9,13 +9,7 @@
     docker_network_name: "{{ server_name }}"
   roles:
     - role: vagrant
-    - role: server
-    - role: docker-secret
-      secret_name: biosentiers_db_postgres_password_v1
-      secret_value: "{{ db_postgres_password }}"
-    - role: docker-secret
-      secret_name: biosentiers_db_password_v1
-      secret_value: "{{ db_password }}"
+    - role: biosentiers
   tasks:
     - name: add local ssh key to root
       authorized_key: user=root key="{{ lookup('file', '~/.ssh/id_rsa.pub') }}"

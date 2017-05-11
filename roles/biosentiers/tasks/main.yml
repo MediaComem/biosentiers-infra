@@ -1,0 +1,23 @@
+---
+- name: create server config directory
+  file:
+    path: /etc/{{ server_name }}
+    owner: root
+    group: root
+    mode: 0700
+    state: directory
+- name: set up docker compose config file
+  template:
+    src: docker-compose.yml
+    dest: /etc/{{ server_name }}/docker-compose.yml
+    owner: root
+    group: root
+    mode: 0600
+- name: check if registry is running
+  command: docker service inspect registry
+  register: registry_running
+  changed_when: false
+  failed_when: registry_running.rc != 0 and registry_running.rc != 1
+- name: run registry
+  command: docker service create --name registry --publish 5000:5000 registry:2
+  when: registry_running.rc != 0
