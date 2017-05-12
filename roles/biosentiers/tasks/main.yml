@@ -13,6 +13,34 @@
     owner: root
     group: root
     mode: 0600
+- name: clone backend repository
+  git:
+    repo: https://github.com/MediaComem/biosentiers-backend.git
+    dest: /srv/biosentiers/backend
+    bare: yes
+    update: no
+- name: clone frontend repository
+  git:
+    repo: https://github.com/MediaComem/biosentiers-frontend.git
+    dest: /srv/biosentiers/frontend
+    bare: yes
+    update: no
+- name: copy db image directory
+  copy:
+    src: db
+    dest: /srv/biosentiers
+- name: copy rp image directory
+  copy:
+    src: rp
+    dest: /srv/biosentiers
+- name: check if www data volume is created
+  command: docker volume inspect biosentiers_www_data
+  register: volume_exists
+  changed_when: false
+  failed_when: volume_exists.rc != 0 and volume_exists.rc != 1
+- name: create www data volume
+  command: docker volume create biosentiers_www_data
+  when: volume_exists.rc != 0
 - name: check if registry is running
   command: docker service inspect registry
   register: registry_running

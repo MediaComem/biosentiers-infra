@@ -5,8 +5,10 @@ networks:
     driver: overlay
   apps:
     driver: overlay
+    internal: true
   storage:
     driver: overlay
+    internal: true
 
 secrets:
   biosentiers_db_postgres_password_v1:
@@ -28,9 +30,11 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - "www_data:/var/www/app"
 
-  app:
-    image: 127.0.0.1:5000/biosentiers/app:${APP_TAG:-latest}
+  backend:
+    image: 127.0.0.1:5000/biosentiers/backend:${BACKEND_TAG:-latest}
     depends_on:
       - db
     deploy:
@@ -88,3 +92,6 @@ services:
 
 volumes:
   db_data:
+  www_data:
+    external:
+      name: biosentiers_www_data

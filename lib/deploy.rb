@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'highline'
 require 'shellwords'
 require 'sshkit'
 require 'sshkit/dsl'
@@ -10,20 +11,35 @@ SSHKit.config.output_verbosity = :debug if ENV['DEBUG']
 DEPLOY_DATA = {}
 
 def set key, value = nil, &block
-  DEPLOY_DATA[key] = value.nil? && block ? block : value
+  DEPLOY_DATA[key.to_sym] = value.nil? && block ? block : value
 end
 
 def fetch key
-  if !DEPLOY_DATA.key?(key)
+  actual_key = key.to_sym
+  if !DEPLOY_DATA.key?(actual_key)
     raise "Unknown deploy data key #{key.inspect}"
-  elsif DEPLOY_DATA[key].respond_to?(:call)
-    DEPLOY_DATA[key] = DEPLOY_DATA[key].call
+  elsif DEPLOY_DATA[actual_key].respond_to?(:call)
+    DEPLOY_DATA[actual_key] = DEPLOY_DATA[actual_key].call
   else
-    DEPLOY_DATA[key]
+    DEPLOY_DATA[actual_key]
   end
 end
 
 set :local_tmp, ->{ Dir.mktmpdir }
+
+def deploy_cli
+  @deploy_cli ||= HighLine.new
+end
+
+def ask question, default: nil, validate: ->(answer){ !answer.to_s.strip.empty? || default }
+  next until validate.call(answer = deploy_cli.ask(question).to_s.strip)
+  answer.empty? ? default : answer
+end
+
+def ask_boolean question, default: false
+  answer = ask question, default: default, validate: ->(answer){ (answer.to_s.strip.empty? && !default.nil?) || answer.to_s.strip.match(/^(0|1|n|no|y|yes|f|false|t|true)$/i) }
+  !answer.to_s.match(/^(1|y|yes|t|true)$/i).nil?
+end
 
 def deploy_task *args, &block
   task *args do |*task_args|

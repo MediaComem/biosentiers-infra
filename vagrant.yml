@@ -8,7 +8,6 @@
     docker_compose_version: 1.12.0
     docker_network_name: "{{ server_name }}"
   roles:
-    - role: vagrant
     - role: biosentiers
   tasks:
     - name: add local ssh key to root
