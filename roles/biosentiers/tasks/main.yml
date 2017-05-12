@@ -33,7 +33,15 @@
   copy:
     src: rp
     dest: /srv/biosentiers
-- name: check if www data volume is created
+- name: check if storage network exists
+  command: docker network inspect biosentiers_storage
+  register: network_exists
+  changed_when: false
+  failed_when: network_exists.rc != 0 and network_exists.rc != 1
+- name: create storage network
+  command: docker network create --driver overlay --internal --attachable biosentiers_storage
+  when: network_exists.rc != 0
+- name: check if www data volume exists
   command: docker volume inspect biosentiers_www_data
   register: volume_exists
   changed_when: false

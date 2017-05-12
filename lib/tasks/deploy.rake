@@ -24,7 +24,7 @@ set :timestamp, ->{ Time.now.strftime("%Y%m%d%H%M%S") }
 set :www_data_volume, ->{ "#{fetch(:server_name)}_www_data" }
 set :registry, '127.0.0.1:5000'
 
-set :default_ref, 'deploy'
+set :default_ref, 'master'
 %i(backend frontend).each do |type|
   set "#{type}_default_ref", ->{ fetch(:default_ref) }
   set "#{type}_repo", ->{ "#{fetch(:src_dir)}/#{type}" }
@@ -75,9 +75,33 @@ deploy_task cleanup: %i(env tmp:clean_all) do
   end
 end
 
+namespace :db do
+  deploy_task migrate: %i(env) do
+    set :backend_ref, 'deploy'
+
+    command = [ '/usr/src/app/node_modules/knex/bin/cli.js', 'migrate:latest' ]
+
+    env = {
+      DATABASE_HOST: 'db',
+      DATABASE_USERNAME: 'biosentiers',
+      DATABASE_PASSWORD_FILE: '/run/secrets/db_password'
+    }
+
+    secrets = {
+      biosentiers_db_password_v1: 'db_password'
+    }
+
+    docker_service_run name: 'migration', image_name: "backend:#{fetch(:backend_ref)}", network: 'biosentiers_storage', command: command, env: env, secrets: secrets
+  end
+end
+
 namespace :deploy do
   deploy_task frontend: %i(env) do
     execute :docker, 'run', '--rm', '--volume', "#{fetch(:www_data_volume)}:/var/www/dist", "#{fetch(:registry)}/#{fetch(:server_name)}/frontend:#{fetch(:frontend_ref)}"
+  end
+
+  deploy_task get_current_refs: %i(env) do
+    set :backend_default_ref, current_service_ref(name: :backend)
   end
 
   deploy_task stack: %i(env) do
@@ -87,7 +111,7 @@ namespace :deploy do
   end
 end
 
-deploy_task deploy: %i(env) do
+deploy_task deploy: %i(env deploy:get_current_refs) do
 
   set :backend_ref, ask(%/Backend version to deploy (git commit, branch or tag; "none" to skip) [#{fetch(:backend_default_ref)}]: /, default: fetch(:backend_default_ref))
   set :frontend_ref, ask(%/Frontend version to deploy (git commit, branch or tag; "none" to skip) [#{fetch(:frontend_default_ref)}]: /, default: fetch(:frontend_default_ref))
@@ -230,4 +254,47 @@ def docker_stack_deploy name:, compose_file: nil
   args << name
 
   execute :docker, :stack, :deploy, *args
+end
+
+def docker_service_run name:, image_name:, network:, command:, env: {}, secrets: {}
+
+  service_name = "#{fetch(:server_name)}_#{name}"
+
+  args = []
+  args << '--name' << service_name
+  args << '--restart-condition' << 'none'
+  args << '--network' << network
+
+  env.each do |key,value|
+    args << '--env' << "#{key}=#{value}"
+  end
+
+  secrets.each do |key,value|
+    args << '--secret' << "source=#{key},target=#{value}"
+  end
+
+  args << "#{fetch(:registry)}/#{fetch(:server_name)}/#{image_name}"
+  args += command
+
+  execute :docker, 'service', 'create', *args
+
+  container_id = nil
+  10.times do
+    container_id = capture(:docker, 'ps', '-a', '-q', '--latest', '--filter', "label=com.docker.swarm.service.name=#{service_name}")
+    break unless container_id.strip.empty?
+    sleep 0.5
+  end
+
+  if container_id
+    execute :docker, 'logs', '-f', container_id
+  else
+    puts Paint['Could not get logs of service container', :red]
+  end
+
+  execute :docker, 'service', 'rm', service_name
+end
+
+def current_service_ref name:
+  image = capture :docker, 'service', 'inspect', '-f', '{{.Spec.TaskTemplate.ContainerSpec.Image}}', "#{fetch(:server_name)}_#{name}"
+  image.sub(fetch(:registry), '').sub(/^[^:]+:/, '').sub(/@[^@]+$/, '')
 end

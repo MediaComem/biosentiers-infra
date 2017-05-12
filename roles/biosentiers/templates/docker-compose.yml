@@ -7,8 +7,8 @@ networks:
     driver: overlay
     internal: true
   storage:
-    driver: overlay
-    internal: true
+    external:
+      name: biosentiers_storage
 
 secrets:
   biosentiers_db_postgres_password_v1:
@@ -21,7 +21,7 @@ services:
   rp:
     image: 127.0.0.1:5000/biosentiers/rp:${RP_TAG:-latest}
     depends_on:
-      - app
+      - backend
     deploy:
       mode: global
     networks:
@@ -43,7 +43,6 @@ services:
       DATABASE_HOST: db
       DATABASE_USERNAME: biosentiers
       DATABASE_PASSWORD_FILE: /run/secrets/db_password
-      NODE_ENV: production
     networks:
       apps:
         aliases:
@@ -71,24 +70,6 @@ services:
         target: db_password
     volumes:
       - "db_data:/var/lib/postgresql/data"
-
-#  migrate:
-#    image: biosentiers/app
-#    build: /srv/biosentiers/app
-#    depends_on:
-#      - db
-#    entrypoint:
-#      - /usr/src/app/node_modules/knex/bin/cli.js
-#    command:
-#      - migrate:latest
-#    environment:
-#      DATABASE_HOST: biosentiers_db
-#      DATABASE_USERNAME: biosentiers
-#      DATABASE_PASSWORD: changeme
-#      NODE_ENV: production
-#    networks:
-#      - intra
-#    restart: "no"
 
 volumes:
   db_data:
