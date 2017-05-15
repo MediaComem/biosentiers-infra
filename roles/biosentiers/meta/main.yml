@@ -1,9 +1,0 @@
----
-dependencies:
-  - role: docker
-  - role: docker-secret
-    secret_name: biosentiers_db_postgres_password_v1
-    secret_value: "{{ db_postgres_password }}"
-  - role: docker-secret
-    secret_name: biosentiers_db_password_v1
-    secret_value: "{{ db_password }}"

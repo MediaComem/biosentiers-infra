@@ -1,9 +1,0 @@
----
-- name: check whether the secret exists
-  command: docker secret inspect {{ secret_name }}
-  register: secret_result
-  changed_when: secret_result.rc != 0 and secret_result.rc != 1
-  failed_when: secret_result.rc != 0 and secret_result.rc != 1
-- name: create the secret
-  shell: echo -n "{{ secret_value }}" | docker secret create {{ secret_name }} -
-  when: secret_result.rc != 0
