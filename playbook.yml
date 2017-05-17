@@ -82,6 +82,7 @@
     - name: create biosentiers user
       user:
         name: biosentiers
+        shell: /bin/bash
         state: present
 
     # Node.js
