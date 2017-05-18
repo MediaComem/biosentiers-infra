@@ -1,0 +1,13 @@
+- name: create frontend directory
+  file:
+    path: /var/www/biosentiers/frontend
+    owner: biosentiers
+    group: biosentiers
+    state: directory
+- name: set frontend node version
+  template:
+    src: .node-version
+    dest: /var/www/biosentiers/frontend/.node-version
+    owner: biosentiers
+    group: biosentiers
+    mode: 0640

@@ -1,0 +1,9 @@
+---
+- name: update apt cache
+  apt:
+    update_cache: true
+  changed_when: false
+- name: install pip
+  apt:
+    name: python-pip
+    state: present

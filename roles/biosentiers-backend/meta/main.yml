@@ -1,0 +1,13 @@
+---
+dependencies:
+  - role: postgresql-app-db
+    db_name: biosentiers
+    db_user_name: biosentiers
+    db_user_password: "{{ biosentiers_backend_db_password }}"
+    db_postgis: yes
+  - role: pm2-user
+    pm2_user_name: biosentiers
+    pm2_user_node_version: "{{ biosentiers_backend_node_version }}"
+  - role: deploy-app
+    deploy_app_name: backend
+    deploy_user_name: biosentiers

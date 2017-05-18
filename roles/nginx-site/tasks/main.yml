@@ -1,0 +1,33 @@
+---
+- name: create ssl directory
+  file:
+    path: /var/ssl
+    mode: 0751
+    state: directory
+- name: create deploy site's ssl directory
+  file:
+    path: /var/ssl/{{ nginx_site_name }}
+    mode: 0750
+    state: directory
+- name: copy ssl certificate
+  copy:
+    src: "{{ item }}"
+    dest: /var/ssl/{{ nginx_site_name }}/{{ item }}
+  notify:
+    - reload nginx
+  with_items:
+    - server.crt
+    - server.key
+- name: set up deploy site's nginx configuration
+  template:
+    src: site.conf
+    dest: /etc/nginx/sites-available/{{ nginx_site_name }}.conf
+  notify:
+    - reload nginx
+- name: enable deploy site's nginx configuration
+  file:
+    src: /etc/nginx/sites-available/{{ nginx_site_name }}.conf
+    dest: /etc/nginx/sites-enabled/{{ nginx_site_name }}.conf
+    state: link
+  notify:
+    - reload nginx

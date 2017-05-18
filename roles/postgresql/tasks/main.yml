@@ -1,0 +1,13 @@
+---
+- name: install postgresql
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - postgresql
+    - postgresql-contrib
+    - postgis
+- name: install psycopg2
+  pip:
+    name: psycopg2
+    state: present

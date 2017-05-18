@@ -1,0 +1,6 @@
+---
+dependencies:
+  - role: nodenv-user
+    nodenv_user_name: "{{ pm2_user_name }}"
+    nodenv_user_group: "{{ pm2_user_group | default(pm2_user_name) }}"
+    nodenv_node_version: "{{ pm2_user_node_version }}"

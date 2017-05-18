@@ -1,0 +1,15 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - biosentiers.production.yml
+  roles:
+
+    - role: firewall
+      firewall_tcp_ports:
+        - "22" # ssh
+        - "80" # http
+        - "443" # https
+
+    # BioSentiers Node.js Backend & Angular Frontend
+    - role: biosentiers

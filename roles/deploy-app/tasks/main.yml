@@ -1,0 +1,7 @@
+---
+- name: create deploy app's www directory
+  file:
+    path: /var/www/{{ deploy_user_name }}/{{ deploy_app_name }}
+    owner: "{{ deploy_user_name }}"
+    group: "{{ deploy_user_group }}"
+    state: directory

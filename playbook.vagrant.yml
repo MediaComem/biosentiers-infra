@@ -1,0 +1,26 @@
+---
+- hosts: all
+  become: true
+  vars_files:
+    - biosentiers.vagrant.yml
+  roles:
+
+    - role: firewall
+      firewall_tcp_ports:
+        - "22" # ssh
+        - "80" # http
+        - "443" # https
+
+    # BioSentiers Node.js Backend & Angular Frontend
+    - role: biosentiers
+
+  tasks:
+
+    - name: add local ssh key to root
+      authorized_key:
+        user: root
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    - name: add local ssh key to biosentiers
+      authorized_key:
+        user: biosentiers
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"

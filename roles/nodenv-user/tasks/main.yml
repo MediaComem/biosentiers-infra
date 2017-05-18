@@ -1,0 +1,52 @@
+---
+- name: install nodenv
+  become: true
+  become_user: "{{ nodenv_user_name }}"
+  git:
+    repo: https://github.com/nodenv/nodenv.git
+    dest: /home/{{ nodenv_user_name }}/.nodenv
+    update: yes
+- name: add nodenv shims to path
+  lineinfile:
+    path: /home/{{ nodenv_user_name }}/.bash_profile
+    regexp: '\.nodenv\/shims'
+    line: 'export PATH="$HOME/.nodenv/bin:$HOME/.nodenv/shims:$PATH"'
+    owner: "{{ nodenv_user_name }}"
+    group: "{{ nodenv_user_group }}"
+    create: yes
+    state: present
+- name: add default node version file
+  template:
+    src: .node-version
+    dest: /home/{{ nodenv_user_name }}/.node-version
+    owner: "{{ nodenv_user_name }}"
+    group: "{{ nodenv_user_group }}"
+- name: configure nodenv bash extensions
+  become: true
+  become_user: "{{ nodenv_user_name }}"
+  command: src/configure
+  args:
+    chdir: /home/{{ nodenv_user_name }}/.nodenv
+    creates: /home/{{ nodenv_user_name }}/.nodenv/src/Makefile
+- name: install nodenv bash extensions
+  become: true
+  become_user: "{{ nodenv_user_name }}"
+  command: make -C src
+  args:
+    chdir: /home/{{ nodenv_user_name }}/.nodenv
+    creates: /home/{{ nodenv_user_name }}/.nodenv/src/realpath.o
+- name: install node-build
+  become: true
+  become_user: "{{ nodenv_user_name }}"
+  git:
+    repo: https://github.com/nodenv/node-build.git
+    dest: /home/{{ nodenv_user_name }}/.nodenv/plugins/node-build
+    update: yes
+- name: install node
+  become: true
+  become_user: "{{ nodenv_user_name }}"
+  command: nodenv install {{ nodenv_node_version }}
+  args:
+    creates: /home/{{ nodenv_user_name }}/.nodenv/versions/{{ nodenv_node_version }}
+  environment:
+    PATH: /home/{{ nodenv_user_name }}/.nodenv/bin:{{ ansible_env.PATH }}

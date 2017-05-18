@@ -1,0 +1,11 @@
+---
+dependencies:
+  - role: biosentiers-backend
+    biosentiers_backend_port: 4000
+    biosentiers_backend_db_password: "{{ biosentiers_db_password }}"
+  - role: biosentiers-frontend
+  - role: nginx-site
+    nginx_site_name: biosentiers
+    nginx_site_root: /var/www/biosentiers/frontend/current/dist
+    nginx_site_backend_path: /api
+    nginx_site_backend_proxy: http://localhost:4000

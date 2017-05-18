@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: deploy-app
+    deploy_app_name: frontend
+    deploy_user_name: biosentiers

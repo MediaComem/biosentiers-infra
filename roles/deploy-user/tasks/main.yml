@@ -1,0 +1,24 @@
+---
+- name: create deploy user
+  user:
+    name: "{{ deploy_user_name }}"
+    shell: /bin/bash
+    state: present
+- name: create www directory
+  file:
+    path: /var/www
+    mode: 0751
+    state: directory
+- name: create deploy user's www directory
+  file:
+    path: /var/www/{{ deploy_user_name }}
+    owner: "{{ deploy_user_name }}"
+    group: "{{ deploy_user_group }}"
+    mode: 0750
+    state: directory
+- name: add nginx's www-data user to deploy user's group
+  user:
+    name: www-data
+    append: true
+    groups:
+      - "{{ deploy_user_group }}"

@@ -1,0 +1,10 @@
+---
+- name: enable firewall
+  ufw:
+    state: enabled
+- name: open tcp ports
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  with_items: "{{ firewall_tcp_ports }}"

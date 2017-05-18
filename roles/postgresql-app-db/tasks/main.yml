@@ -1,0 +1,29 @@
+---
+- name: create db user
+  become: true
+  become_user: postgres
+  postgresql_user:
+    name: "{{ db_user_name }}"
+    password: "{{ db_user_password }}"
+    state: present
+- name: create db
+  become: true
+  become_user: postgres
+  postgresql_db:
+    name: "{{ db_name }}"
+    owner: "{{ db_user_name }}"
+    encoding: UTF-8
+    state: present
+- name: check if postgis is enabled
+  become: true
+  become_user: postgres
+  command: psql -c '\d spatial_ref_sys' {{ db_name }}
+  register: postgis_enabled
+  changed_when: false
+  failed_when: postgis_enabled.rc != 0 and postgis_enabled.rc != 1
+  when: db_postgis is defined and db_postgis
+- name: enable postgis
+  become: true
+  become_user: postgres
+  command: psql -c 'CREATE EXTENSION postgis;' {{ db_name }}
+  when: db_postgis is defined and db_postgis and postgis_enabled.rc != 0

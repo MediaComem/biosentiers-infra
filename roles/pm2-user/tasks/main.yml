@@ -1,0 +1,30 @@
+---
+- name: install pm2
+  become: true
+  become_user: "{{ pm2_user_name }}"
+  npm:
+    name: pm2
+    global: yes
+    executable: /home/{{ pm2_user_name }}/.nodenv/shims/npm
+    state: present
+  environment:
+    NODENV_VERSION: "{{ pm2_user_node_version }}"
+    PATH: /home/{{ pm2_user_name }}/.nodenv/shims:{{ ansible_env.PATH }}
+- name: rehash pm2
+  become: true
+  become_user: "{{ pm2_user_name }}"
+  command: nodenv rehash
+  args:
+    creates: /home/{{ pm2_user_name }}/.nodenv/shims/pm2
+  environment:
+    PATH: /home/{{ pm2_user_name }}/.nodenv/bin:{{ ansible_env.PATH }}
+- name: create pm2 systemd service
+  template:
+    src: pm2.service
+    dest: /etc/systemd/system/pm2-{{ pm2_user_name }}.service
+- name: start pm2
+  systemd:
+    state: started
+    enabled: yes
+    daemon_reload: yes
+    name: pm2-{{ pm2_user_name }}

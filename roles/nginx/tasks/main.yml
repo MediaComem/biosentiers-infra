@@ -1,0 +1,20 @@
+---
+- name: install nginx
+  apt:
+    name: nginx
+    state: present
+- name: ensure default site is absent
+  file:
+    path: /etc/nginx/{{ item }}/default
+    state: absent
+  notify:
+    - reload nginx
+  with_items:
+    - sites-available
+    - sites-enabled
+- name: set up nginx configuration
+  template:
+    src: nginx.conf
+    dest: /etc/nginx/nginx.conf
+  notify:
+    - reload nginx
