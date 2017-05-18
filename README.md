@@ -14,15 +14,6 @@ follow the instructions in their respective repositories:
 * https://github.com/MediaComem/biosentiers-backend
 * https://github.com/MediaComem/biosentiers-frontend
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-
-- [Requirements](#requirements)
-- [Usage](#usage)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 
 
 ## Requirements
