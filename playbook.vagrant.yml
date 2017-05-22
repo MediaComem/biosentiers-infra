@@ -5,6 +5,7 @@
     - biosentiers.vagrant.yml
   roles:
 
+    - role: base
     - role: firewall
       firewall_tcp_ports:
         - "22" # ssh
