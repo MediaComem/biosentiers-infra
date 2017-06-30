@@ -28,17 +28,22 @@
     name: "{{ item }}"
     state: present
   with_items:
-    - postgresql
-    - postgresql-contrib
+    - postgresql-{{ postgresql_version }}
+    - postgresql-contrib-{{ postgresql_version }}
     - postgis
+  tags: [ postgresql ]
+- name: configure postgresql authentication
+  template:
+    src: pg_hba.conf
+    dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: 0640
+  notify:
+    - reload postgresql
   tags: [ postgresql ]
 - name: start postgresql
   service:
     name: postgresql
     state: started
-  tags: [ postgresql ]
-- name: install psycopg2
-  pip:
-    name: psycopg2
-    state: present
   tags: [ postgresql ]

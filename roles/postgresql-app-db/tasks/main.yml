@@ -1,4 +1,9 @@
 ---
+- name: install psycopg2
+  pip:
+    name: psycopg2
+    state: present
+  tags: [ postgresql ]
 - name: create db user
   become: true
   become_user: postgres
@@ -14,6 +19,18 @@
     owner: "{{ db_user_name }}"
     encoding: UTF-8
     state: present
+- name: update postgresql authentication
+  lineinfile:
+    path: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+    regexp: "biosentiers"
+    #      TYPE    DATABASE        USER            ADDRESS                 METHOD
+    line: "local   biosentiers     biosentiers                             peer"
+  register: pg_hba_result
+- name: reload postgresql
+  service:
+    name: postgresql
+    state: reloaded
+  when: pg_hba_result|changed
 - name: check if postgis is enabled
   become: true
   become_user: postgres
