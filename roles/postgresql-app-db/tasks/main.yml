@@ -20,11 +20,19 @@
     encoding: UTF-8
     state: present
 - name: update postgresql authentication
-  lineinfile:
-    path: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
-    regexp: "biosentiers"
-    #      TYPE    DATABASE        USER            ADDRESS                 METHOD
-    line: "local   biosentiers     biosentiers                             peer"
+  template:
+    src: pg_hba.conf
+    dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.d/biosentiers
+    owner: postgres
+    group: postgres
+    mode: 0640
+- name: rebuild pg_hba.conf
+  assemble:
+    src: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.d
+    dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+    owner: postgres
+    group: postgres
+    mode: 0640
   register: pg_hba_result
 - name: reload postgresql
   service:

@@ -32,9 +32,24 @@
     - postgresql-contrib-{{ postgresql_version }}
     - postgis
   tags: [ postgresql ]
+- name: create postgresql authentication directory
+  file:
+    path: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.d
+    owner: postgres
+    group: postgres
+    mode: 0750
+    state: directory
 - name: configure postgresql authentication
   template:
     src: pg_hba.conf
+    dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.d/0-main.conf
+    owner: postgres
+    group: postgres
+    mode: 0640
+  tags: [ postgresql ]
+- name: build pg_hba.conf
+  assemble:
+    src: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.d
     dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
     owner: postgres
     group: postgres
