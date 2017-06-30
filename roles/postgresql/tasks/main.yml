@@ -1,4 +1,28 @@
 ---
+- name: get os release
+  command: lsb_release -cs
+  register: lsb_release_result
+  changed_when: false
+  tags: [ postgresql ]
+- name: add postgresql apt repository
+  lineinfile:
+    path: /etc/apt/sources.list.d/pgdg.list
+    regexp: "apt.postgresql.org"
+    line: "deb http://apt.postgresql.org/pub/repos/apt/ {{ lsb_release_result.stdout.strip() }}-pgdg main"
+    create: yes
+  register: postgresql_apt_repository_result
+  tags: [ postgresql ]
+- name: add postgresql signing key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+  register: postgresql_signing_key_result
+  tags: [ postgresql ]
+- name: update apt cache
+  apt:
+    update_cache: yes
+  when: postgresql_apt_repository_result|changed or postgresql_signing_key_result|changed
+  tags: [ postgresql ]
 - name: install postgresql
   apt:
     name: "{{ item }}"
@@ -7,7 +31,14 @@
     - postgresql
     - postgresql-contrib
     - postgis
+  tags: [ postgresql ]
+- name: start postgresql
+  service:
+    name: postgresql
+    state: started
+  tags: [ postgresql ]
 - name: install psycopg2
   pip:
     name: psycopg2
     state: present
+  tags: [ postgresql ]
