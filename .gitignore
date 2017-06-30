@@ -1,6 +1,7 @@
 /.screenrc
 /.vagrant
 /.vault-password
+/*.inventory
 /*.log
 /*.retry
 /env*
