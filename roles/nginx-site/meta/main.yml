@@ -1,3 +1,5 @@
 ---
 dependencies:
   - role: nginx
+  - role: certbot
+    when: nginx_site_certbot_certificate is defined

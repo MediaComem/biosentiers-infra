@@ -1,0 +1,36 @@
+---
+- name: install certbot dependencies
+  apt:
+    name: software-properties-common
+    state: present
+  tags: [ certbot ]
+
+- name: add certbot apt repository
+  apt_repository:
+    repo: ppa:certbot/certbot
+    state: present
+  register: certbot_apt_repository
+  tags: [ certbot ]
+
+- name: update apt cache
+  apt:
+    update_cache: yes
+  when: certbot_apt_repository|changed
+  tags: [ certbot ]
+
+- name: install certbot
+  apt:
+    name: certbot
+    state: present
+  tags: [ certbot ]
+
+- name: attempt to auto-renew certificates every day
+  cron:
+    name: renew ssl certificates
+    minute: "0"
+    hour: "{{ certbot_renewal_hour | default(2) }}" # defaults to 3 a.m. CET (or 4 a.m. CEST)
+    day: "*"
+    weekday: "*"
+    month: "*"
+    job: "/usr/bin/certbot renew --post-hook '/usr/sbin/nginx -s reload'"
+  tags: [ certbot ]
