@@ -10,6 +10,7 @@
   environment:
     NODENV_VERSION: "{{ pm2_user_node_version }}"
     PATH: /home/{{ pm2_user_name }}/.nodenv/shims:{{ ansible_env.PATH }}
+  register: install_pm2
 - name: rehash pm2
   become: true
   become_user: "{{ pm2_user_name }}"
@@ -18,13 +19,15 @@
     creates: /home/{{ pm2_user_name }}/.nodenv/shims/pm2
   environment:
     PATH: /home/{{ pm2_user_name }}/.nodenv/bin:{{ ansible_env.PATH }}
+  register: rehash_pm2
 - name: create pm2 systemd service
   template:
     src: pm2.service
     dest: /etc/systemd/system/pm2-{{ pm2_user_name }}.service
+  register: pm2_service
 - name: start pm2
   systemd:
-    state: started
+    state: "{{ 'restarted' if install_pm2|changed or rehash_pm2|changed or pm2_service|changed else 'started' }}"
     enabled: yes
     daemon_reload: yes
     name: pm2-{{ pm2_user_name }}
