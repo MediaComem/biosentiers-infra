@@ -2,4 +2,9 @@
 dependencies:
   - role: nginx
   - role: certbot
-    when: nginx_site_certbot_certificate is defined
+# TODO: implement automatically getting the certificate (must be done after the site is deployed for webroot)
+#  - role: certbot-cert
+#    certbot_cert_name: "{{ nginx_site_certbot_certificate }}"
+#    certbot_cert_webroot: "{{ nginx_site_root }}"
+#    certbot_cert_domains: "{{ nginx_site_hosts }}"
+#    when: nginx_site_certbot_certificate is defined

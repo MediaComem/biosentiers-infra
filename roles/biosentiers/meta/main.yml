@@ -5,7 +5,9 @@ dependencies:
     biosentiers_backend_db_password: "{{ biosentiers_db_password }}"
   - role: biosentiers-frontend
   - role: nginx-site
+    certbot_email: mei@heig-vd.ch
     nginx_site_name: biosentiers
+    # TODO: support multiple hosts
     nginx_site_hosts: biosentiers.heig-vd.ch
     nginx_site_certbot_certificate: biosentiers
     nginx_site_root: /var/www/biosentiers/frontend/current/dist

@@ -1,0 +1,3 @@
+---
+- name: obtain let's encrypt ssl certificate
+  command: /usr/bin/certbot certonly -n --webroot --cert-name {{ certbot_cert_name }} -w {{ certbot_cert_webroot }} -d {{ certbot_cert_domains }}

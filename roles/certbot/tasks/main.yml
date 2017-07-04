@@ -24,6 +24,17 @@
     state: present
   tags: [ certbot ]
 
+- name: check if a let's encrypt account exists
+  command: ls -A /etc/letsencrypt/accounts
+  register: account_exists
+  changed_when: false
+  tags: [ certbot ]
+
+- name: register a let's encrypt account
+  command: /usr/bin/certbot register -n --agree-tos -m {{ certbot_email }} --no-eff-email
+  when: account_exists.stdout == ''
+  tags: [ certbot ]
+
 - name: attempt to auto-renew certificates every day
   cron:
     name: renew ssl certificates
