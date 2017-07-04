@@ -1,0 +1,6 @@
+---
+nginx_site_certbot_certificates_path: /etc/letsencrypt/live
+nginx_site_certbot_certificate_filename: fullchain.pem
+nginx_site_certbot_certificate_path: "{{ nginx_site_certbot_certificates_path }}/{{ nginx_site_certbot_certificate }}/{{ nginx_site_certbot_certificate_filename }}"
+nginx_site_certbot_certificate_key_filename: privkey.pem
+nginx_site_certbot_certificate_key_path: "{{ nginx_site_certbot_certificates_path }}/{{ nginx_site_certbot_certificate }}/{{ nginx_site_certbot_certificate_key_filename }}"

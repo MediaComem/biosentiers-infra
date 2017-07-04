@@ -3,9 +3,17 @@
   become: true
   vars_files:
     - biosentiers.vagrant.yml
+  vars:
+    - nginx_site_certbot_certificates_path: /var/ssl
+
   roles:
 
+    # Generate a self-signed certificate
+    - role: vagrant-ssl-cert
+      vagrant_ssl_cert_name: biosentiers
+
     - role: base
+
     - role: firewall
       firewall_tcp_ports:
         - "22" # ssh

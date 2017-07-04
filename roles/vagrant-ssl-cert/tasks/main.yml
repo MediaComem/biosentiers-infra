@@ -1,0 +1,26 @@
+---
+- name: create biosentiers ssl directory
+  file:
+    path: /var/ssl/{{ vagrant_ssl_cert_name }}
+    mode: 0750
+    state: directory
+- name: generate original ssl key
+  command: openssl genrsa -des3 -passout pass:letmein -out privkey.pem.orig 2048
+  args:
+    chdir: /var/ssl/{{ vagrant_ssl_cert_name }}
+    creates: /var/ssl/{{ vagrant_ssl_cert_name }}/privkey.pem.orig
+- name: create unprotected ssl key
+  command: openssl rsa -in privkey.pem.orig -passin pass:letmein -out privkey.pem
+  args:
+    chdir: /var/ssl/{{ vagrant_ssl_cert_name }}
+    creates: /var/ssl/{{ vagrant_ssl_cert_name }}/privkey.pem
+- name: generate ssl csr
+  command: openssl req -new -key privkey.pem -out cert.csr -subj "/C=US/ST=IL/L=Chicago/O=OrgName/OU=IT Department/CN={{ vagrant_ssl_cert_name }}.vagrant"
+  args:
+    chdir: /var/ssl/{{ vagrant_ssl_cert_name }}
+    creates: /var/ssl/{{ vagrant_ssl_cert_name }}/cert.csr
+- name: generate self-signed certificate
+  command: openssl x509 -req -days 3650 -in cert.csr -signkey privkey.pem -out fullchain.pem
+  args:
+    chdir: /var/ssl/{{ vagrant_ssl_cert_name }}
+    creates: /var/ssl/{{ vagrant_ssl_cert_name }}/fullchain.pem

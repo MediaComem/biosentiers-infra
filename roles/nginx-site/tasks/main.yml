@@ -1,26 +1,4 @@
 ---
-- name: create ssl directory
-  file:
-    path: /var/ssl
-    mode: 0751
-    state: directory
-  tags: [ nginx, site ]
-- name: create deploy site's ssl directory
-  file:
-    path: /var/ssl/{{ nginx_site_name }}
-    mode: 0750
-    state: directory
-  tags: [ nginx, site ]
-- name: copy ssl certificate
-  copy:
-    src: "{{ item }}"
-    dest: /var/ssl/{{ nginx_site_name }}/{{ item }}
-  notify:
-    - reload nginx
-  with_items:
-    - server.crt
-    - server.key
-  tags: [ nginx, site ]
 - name: set up deploy site's nginx configuration
   template:
     src: site.conf
