@@ -1,2 +1,3 @@
 ---
+db_app_name: "{{ db_name }}"
 postgresql_version: 9.6

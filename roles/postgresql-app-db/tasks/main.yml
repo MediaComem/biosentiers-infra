@@ -22,7 +22,7 @@
 - name: update postgresql authentication
   template:
     src: pg_hba.conf
-    dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.d/biosentiers
+    dest: /etc/postgresql/{{ postgresql_version }}/main/pg_hba.d/{{ db_app_name }}
     owner: postgres
     group: postgres
     mode: 0640
