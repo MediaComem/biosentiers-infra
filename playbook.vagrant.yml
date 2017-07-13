@@ -4,7 +4,8 @@
   vars_files:
     - biosentiers.vagrant.yml
   vars:
-    - nginx_site_certbot_certificates_path: /var/ssl
+    vagrant: true
+    nginx_site_certbot_certificates_path: /var/ssl
 
   roles:
 
