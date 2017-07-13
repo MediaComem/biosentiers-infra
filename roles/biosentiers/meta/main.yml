@@ -6,6 +6,12 @@ dependencies:
   - role: biosentiers-frontend
   - role: nginx-site
     certbot_email: mei@heig-vd.ch
+    nginx_site_maintenance_who: L'équipe BioSentiers
+    nginx_site_maintenance_message: >
+      Le site est momentanément indisponible pour cause de maintenance.
+      Veuillez réessayer dans un instant.
+    nginx_site_maintenance_path: "/var/www/biosentiers/frontend/maintenance.html"
+    nginx_site_maintenance_user: biosentiers
     nginx_site_name: biosentiers
     # TODO: support multiple hosts
     nginx_site_hosts: biosentiers.heig-vd.ch
@@ -13,4 +19,5 @@ dependencies:
     nginx_site_root: /var/www/biosentiers/frontend/current/dist
     nginx_site_backend_path: /api
     nginx_site_backend_proxy: http://localhost:4000
+    nginx_site_backend_maintenance_path: "/var/www/biosentiers/frontend/maintenance.json"
     nginx_site_landing_page_root: /var/www/biosentiers/landing-page/current/dist

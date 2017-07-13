@@ -1,4 +1,12 @@
 ---
+nginx_site_maintenance_message: >
+  Sorry for the inconvenience, but we're performing maintenance at the moment.
+  We'll be back online shortly.
+nginx_site_maintenance_who: The Team
+nginx_site_maintenance_path: "{{ nginx_site_root }}/maintenance-off.html"
+nginx_site_maintenance_user: root
+nginx_site_maintenance_group: "{{ nginx_site_maintenance_user | default(omit) }}"
+nginx_site_backend_maintenance_path: "{{ nginx_site_root }}/maintenance-off.json"
 nginx_site_certbot_certificates_path: /etc/letsencrypt/live
 nginx_site_certbot_certificate_filename: fullchain.pem
 nginx_site_certbot_certificate_path: "{{ nginx_site_certbot_certificates_path }}/{{ nginx_site_certbot_certificate }}/{{ nginx_site_certbot_certificate_filename }}"

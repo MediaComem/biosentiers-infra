@@ -14,3 +14,17 @@
   notify:
     - reload nginx
   tags: [ nginx, site ]
+- name: prepare frontend maintenance page
+  template:
+    src: maintenance.html
+    dest: "{{ nginx_site_maintenance_path }}"
+    owner: "{{ nginx_site_maintenance_user }}"
+    group: "{{ nginx_site_maintenance_group }}"
+  tags: [ nginx, site ]
+- name: prepare backend maintenance page
+  template:
+    src: maintenance.json
+    dest: "{{ nginx_site_backend_maintenance_path }}"
+    owner: "{{ nginx_site_maintenance_user }}"
+    group: "{{ nginx_site_maintenance_group }}"
+  tags: [ nginx, site ]
