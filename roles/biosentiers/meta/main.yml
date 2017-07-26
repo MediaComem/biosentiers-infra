@@ -1,8 +1,10 @@
 ---
 dependencies:
   - role: biosentiers-backend
+    biosentiers_backend_base_url: "http://biosentiers.heig-vd.ch"
     biosentiers_backend_port: 4000
-    biosentiers_backend_db_password: "{{ biosentiers_db_password }}"
+    biosentiers_backend_smtp_from_name: "BioSentiers"
+    biosentiers_backend_smtp_from_address: "biosentiers@alphahydrae.com"
   - role: biosentiers-frontend
   - role: nginx-site
     certbot_email: mei@heig-vd.ch
