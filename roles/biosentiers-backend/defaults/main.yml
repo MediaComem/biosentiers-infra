@@ -1,5 +1,6 @@
 biosentiers_backend_base_url: "{{ biosentiers_base_url | default(omit) }}"
-biosentiers_backend_db_password: "{{ biosentiers_db_password }}"
+biosentiers_backend_db_password: "{{ biosentiers_db_password | default(omit) }}"
+biosentiers_backend_secret: "{{ biosentiers_secret | default(omit) }}"
 biosentiers_backend_smtp_host: "{{ biosentiers_smtp_host | default(omit) }}"
 biosentiers_backend_smtp_port: "{{ biosentiers_smtp_port | default(omit) }}"
 biosentiers_backend_smtp_secure: "{{ biosentiers_smtp_secure | default(omit) }}"
