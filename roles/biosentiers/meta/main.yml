@@ -1,7 +1,7 @@
 ---
 dependencies:
   - role: biosentiers-backend
-    biosentiers_backend_base_url: "http://biosentiers.heig-vd.ch"
+    biosentiers_backend_base_url: "https://biosentiers.heig-vd.ch"
     biosentiers_backend_port: 4000
     biosentiers_backend_smtp_from_name: "BioSentiers"
     biosentiers_backend_smtp_from_address: "no-reply-biosentiers@heig-vd.ch"
